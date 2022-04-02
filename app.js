@@ -3,8 +3,8 @@ const sequelize = require('./database');
 const Icream = require('./model/icream');
 const User = require('./model/user');
 
-Icream.hasMany(User);
-User.belongsTo(Icream);
+Icream.hasMany(User,{as:'user'});
+User.belongsTo(Icream, {as:'icream'});
 
 sequelize.sync(
     // {force:true}
@@ -58,6 +58,18 @@ app.get('/users', async (req, res) => {
     let users = await User.findAll()
     res.send(users);
 })
+
+app.get('/icreams-vote', async (req, res) => {
+    let icreams = await Icream.findAll({ include: ["user"] })
+    res.send(icreams)
+})
+
+app.get('/icream-vote/:id', async (req, res) => {
+    const icreamId = req.params.id;
+    let icream = await Icream.findByPk(icreamId, { include: ["user"] })
+    res.send(icream)
+})
+
 
 app.listen(3131, () => {
     console.log('Server is running')
